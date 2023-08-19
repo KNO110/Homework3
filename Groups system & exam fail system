@@ -1,0 +1,148 @@
+////Powered by Ak1ne
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Student
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public int Age { get; set; }
+    public int Grade { get; set; }
+
+    public override string ToString()
+    {
+        return $"{LastName} {FirstName}, Возраст: {Age}, Оценки: {Grade}";
+    }
+}
+
+class Group
+{
+    private List<Student> students = new List<Student>();
+    public string GroupName { get; set; }
+    public string Specialization { get; set; }
+    public int Course { get; set; }
+
+    public Group()
+    {
+        GenerateRandomStudents(10);
+        Course = 1;
+    }
+
+    public Group(Student[] initialStudents)
+    {
+        students.AddRange(initialStudents);
+        Course = 1;
+    }
+
+    public Group(Group otherGroup)
+    {
+        students = otherGroup.students.Select(s => new Student
+        {
+            FirstName = s.FirstName,
+            LastName = s.LastName,
+            Age = s.Age,
+            Grade = s.Grade
+        }).ToList();
+
+        GroupName = otherGroup.GroupName;
+        Specialization = otherGroup.Specialization;
+        Course = otherGroup.Course;
+    }
+
+    public void ShowStudents()
+    {
+        Console.WriteLine($"Группа: {GroupName}, Факультет: {Specialization}, Курс: {Course}");
+        var sortedStudents = students.OrderBy(s => s.LastName).ThenBy(s => s.FirstName).ToList();
+        for (int i = 0; i < sortedStudents.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}. {sortedStudents[i]}");
+        }
+    }
+
+    public void AddStudent(Student student)
+    {
+        students.Add(student);
+    }
+
+    public void Edit_Group_info(string newGroupName, string newSpecialization)
+    {
+        GroupName = newGroupName;
+        Specialization = newSpecialization;
+    }
+
+    public void Edit_St_Info(int index, string newFirstName, string newLastName, int newAge, int newGrade)
+    {
+        if (index >= 0 && index < students.Count)
+        {
+            students[index].FirstName = newFirstName;
+            students[index].LastName = newLastName;
+            students[index].Age = newAge;
+            students[index].Grade = newGrade;
+        }
+    }
+
+    public void PassYear()
+    {
+        Course++; // Move to the next course
+        Failed_St(); // Expel students with grades less than 6
+    }
+
+    private void Failed_St()
+    {
+        students.RemoveAll(s => s.Grade < 6);
+    }
+
+    private void GenerateRandomStudents(int count)
+    {
+        Random random = new Random();
+        string[] firstNames = { "Джонни", "Кира", "Джозеф", "Куджо", "Джолин", "ДжоДжо" };
+        string[] lastNames = { "Джостар", "Йошикаге", "", "Эмпорио", "Акитакагава", "Валентайн" };
+
+        for (int i = 0; i < count; i++)
+        {
+            var student = new Student
+            {
+                FirstName = firstNames[random.Next(firstNames.Length)],
+                LastName = lastNames[random.Next(lastNames.Length)],
+                Age = random.Next(18, 25),
+                Grade = random.Next(1, 11)
+            };
+
+            students.Add(student);
+        }
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Group group1 = new Group();
+        group1.GroupName = "A";
+        group1.Specialization = "Computer Science";
+
+        Group group2 = new Group();
+        group2.GroupName = "B";
+        group2.Specialization = "Engineering";
+
+        Console.WriteLine("Данные: ");
+        Console.WriteLine("Группа 1:");
+        group1.ShowStudents();
+
+        Console.WriteLine("\nГруппа 2:");
+        group2.ShowStudents();
+
+        Console.WriteLine("\nСкип времени:");
+        group1.PassYear();
+        group2.PassYear();
+
+        Console.WriteLine("1 группа после года: ");
+        group1.ShowStudents();
+
+        Console.WriteLine("\n2 группа после года: ");
+        group2.ShowStudents();
+
+        Console.WriteLine("\nPowered by Ak1ne");
+    }
+}
